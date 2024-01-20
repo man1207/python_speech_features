@@ -6,7 +6,7 @@ from python_speech_features import sigproc
 from scipy.fftpack import dct
 
 def stft(signal,samplerate=16000,winlen=0.025,winstep=0.01,
-         lowfreq=0,highfreq=None,preemph=0.97,
+         nfft=512,lowfreq=0,highfreq=None,preemph=0.97,
          winfunc=lambda x:numpy.ones((x,))):
     """
     """
