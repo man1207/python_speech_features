@@ -5,6 +5,24 @@ import numpy
 from python_speech_features import sigproc
 from scipy.fftpack import dct
 
+def stft(signal,samplerate=16000,winlen=0.025,winstep=0.01,
+         lowfreq=0,highfreq=None,preemph=0.97,
+         winfunc=lambda x:numpy.ones((x,))):
+    """
+    """
+    highfreq= highfreq or samplerate/2
+    signal = sigproc.preemphasis(signal,preemph)
+    frames = sigproc.framesig(signal, winlen*samplerate, winstep*samplerate, winfunc)
+
+    if numpy.shape(frames)[1] > nfft:
+        logging.warn(
+            'frame length (%d) is greater than FFT size (%d), frame will be truncated. Increase NFFT to avoid.',
+            numpy.shape(frames)[1], nfft)
+    complex_spec = numpy.fft.rfft(frames, nfft)
+    magnitude = numpy.absolute(complex_spec)
+    angle = numpy.angle(complex_spec)
+    return magnitude, angle
+
 def calculate_nfft(samplerate, winlen):
     """Calculates the FFT size as a power of two greater than or equal to
     the number of samples in a single window length.
