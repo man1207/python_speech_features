@@ -5,7 +5,7 @@ import numpy
 from python_speech_features import sigproc
 from scipy.fftpack import dct
 
-def istft(magnitude, sinx, cosx, winstep, winlen, samplerate, nfft, preemph=0.97, winfunc=lambda x: np.ones((x,))):
+def istft(magnitude, sinx, cosx, winstep, winlen, samplerate, nfft, preemph=0.97, winfunc=lambda x: numpy.ones((x,))):
     """
     """
     complex_spec = magnitude * (cosx + 1j * sinx)
@@ -13,7 +13,7 @@ def istft(magnitude, sinx, cosx, winstep, winlen, samplerate, nfft, preemph=0.97
     signal = sigproc.deframesig(frames, siglen=0, frame_len=winlen, frame_step=winstep, winfunc=winfunc)
 
     if preemph > 0:
-        output_signal = np.zeros_like(signal)
+        output_signal = numpy.zeros_like(signal)
         output_signal[0] = signal[0]
 
     for i in range(1, len(signal)):
