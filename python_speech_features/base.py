@@ -37,16 +37,17 @@ def stft(signal,samplerate=16000,winlen=0.025,winstep=0.01,
     complex_spec = numpy.fft.rfft(frames, nfft)
     magnitude = numpy.absolute(complex_spec)
     angle = numpy.angle(complex_spec)
-    pspec =  1.0 / nfft * numpy.square(magnitude)
 
-    pspec[pspec <= 1e-30] = 1e-30
-    lps = 10 * numpy.log10(pspec)
+    return magnitude, angle
 
-    return magnitude, lps, angle
+def logpow(mag):
+    pspec = numpy.maximum(mag**2, 1e-12)
 
-def ilogpower(lps):
-    pspec = 10 ** (lps/10)
-    magnitude = numpy.sqrt(pspec * nttf)
+    return numpy.log10(pspec) 
+
+def ilogpow(lps):
+    pspec = 10 ** lps
+    magnitude = numpy.sqrt(pspec)
 
     return magnitude
 
