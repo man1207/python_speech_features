@@ -5,6 +5,22 @@ import numpy
 from python_speech_features import sigproc
 from scipy.fftpack import dct
 
+def istft(magnitude, sinx, cosx, winstep, winlen, samplerate, nfft, preemph=0.97, winfunc=lambda x: np.ones((x,))):
+    """
+    """
+    complex_spec = magnitude * (cosx + 1j * sinx)
+    frames = numpy.fft.irfft(complex_spec, n=nfft)
+    signal = sigproc.deframesig(frames, siglen=0, frame_len=winlen, frame_step=winstep, winfunc=winfunc)
+
+    if preemph > 0:
+        output_signal = np.zeros_like(signal)
+        output_signal[0] = signal[0]
+
+    for i in range(1, len(signal)):
+        output_signal[i] = signal[i] + preemph * output_signal[i-1]
+
+    return output_signal
+
 def stft(signal,samplerate=16000,winlen=0.025,winstep=0.01,
          nfft=512,lowfreq=0,highfreq=None,preemph=0.97,
          winfunc=lambda x:numpy.ones((x,))):
@@ -21,7 +37,19 @@ def stft(signal,samplerate=16000,winlen=0.025,winstep=0.01,
     complex_spec = numpy.fft.rfft(frames, nfft)
     magnitude = numpy.absolute(complex_spec)
     angle = numpy.angle(complex_spec)
-    return magnitude, angle
+    pspec =  1.0 / nfft * numpy.square(magnitude)
+
+    pspec[pspec <= 1e-30] = 1e-30
+    lps = 10 * numpy.log10(pspec)
+
+    return magnitude, lps, angle
+
+def ilogpower(lps):
+    pspec = 10 ** (lps/10)
+    magnitude = numpy.sqrt(pspec * nttf)
+
+    return magnitude
+
 
 def calculate_nfft(samplerate, winlen):
     """Calculates the FFT size as a power of two greater than or equal to
